@@ -4,11 +4,11 @@ S:"^";H:"(";T:")";D:";"
 mt:()!()
 mt[-10 10h]:(::)
 mt[-11 -5 -6 -7 -8 -9 5 6 7 8 9 11h]:-3!
-mt[-12h]:{(mt[-14h]"d"$x)," at ",(:/"D"\:$x)};mt[12h]:" "/:mt[-12h]'
-mt[-13h]:{($``Jan`Feb`Mar`Apr`May`Jun`Jul`Aug`Sep`Oct`Nov`Dec `mm$x)," ",$`year$x};mt[13h]:" "/:mt[-13h]'
-mt[-14h]:{($``Jan`Feb`Mar`Apr`May`Jun`Jul`Aug`Sep`Oct`Nov`Dec `mm$x)," ",($`dd$x),", ",$`year$x};mt[14h]:" "/:mt[-14h]'
-mt[-15h]:{(mt[-14h]"d"$x)," at ",$"t"$x};mt[15h]:" "/:mt[-15h]'
-mt[-16h]:{{x," day",$[x~,"1";"";"s"]," and ",y}."D"\:$x}
+mt[-12h]:{(mt[-14h]"d"$x)," at ",(:/"D"\:$x)};mt[12h]:-3!
+mt[-13h]:{($``Jan`Feb`Mar`Apr`May`Jun`Jul`Aug`Sep`Oct`Nov`Dec `mm$x)," ",$`year$x};mt[13h]:-3!
+mt[-14h]:{($``Jan`Feb`Mar`Apr`May`Jun`Jul`Aug`Sep`Oct`Nov`Dec `mm$x)," ",($`dd$x),", ",$`year$x};mt[14h]:-3!
+mt[-15h]:{(mt[-14h]"d"$x)," at ",$"t"$x};mt[15h]:-3!
+mt[-16h]:{{x," day",$[x~,"1";"";"s"]," and ",y}."D"\:$x};mt[16h]:-3!
 mt[-19 -18 -17 17 18 19h]:-3!
 mt[98h]:{(-2_{x,y,":",wt[z],", "}/["[";$!+x;.+x]),"]"}
 mt[99h]:{$[98 98h~@:'(!x;. x);[f:mt 98h;"{",(f@!x),":",f[. x],"}"];(-2_{x,wt[y],":",wt[z],", "}/["{";!x;. x]),"}"]}
