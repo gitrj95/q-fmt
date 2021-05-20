@@ -1,0 +1,62 @@
+simple format string lib
+
+motivation
+- pretty printing various things to stdout or stderr is a common logging convention
+- the %x idiom seemed tiresome
+- allow users the ability to trivially customize
+- recursively walk through composite types (excluding vectors, dictionaries, and tables)
+
+interface
+.fmt.S   separator that defines insertion points. defaults to "^". can be any char or string
+.fmt.H   defines the head char of a composite type. defaults to "(". can be any char or string
+.fmt.T   defines the tail char of a composite type. defaults to ")". can be any char or string
+.fmt.D   defines the delimiter between entries of a composite type. defaults to ";". can be any char
+         or string
+.fmt.mt  dictionary that maps types to their string representations. defaults are omitted here.
+         inspect the code and alter to preference
+
+.fmt.fmt produces a formatted string given a mixed list
+
+examples
+q)/ .fmt.fmt takes a (<string>;<any>;<any>;..)
+q).fmt.fmt("^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`market;10;"pies";5.5)
+"rj went to the `market to buy 10 pies, but only 5.5 were available"
+
+q)/ can be a char, too
+q).fmt.fmt("^";1 2 3)
+"1 2 3"
+
+q)/ the dicts and table defaults were the result of some polls. change them if you don't like them
+q).fmt.fmt("^ is a simple table. ^ is keyed. ^ is a dict";([]1 2 3);2!([]1 2;3 4;5 6);`a`b!1 2)
+"[x:1 2 3] is a simple table. {[x:1 2, x1:3 4]:[x2:5 6]} is keyed. {`a:1, `b:2} is a dict"
+
+q)/ composite types are recursively resolved to their primitive representations
+q).fmt.fmt("^ is a funky thing";(`a`b;1 2.;("apple";"cat")))
+"(`a`b;1 2f;(apple;cat)) is a funky thing"
+
+q)/ some temporal atoms are printed in english
+q).fmt.fmt("on ^, i ate ^ apple. but i think i ate two the month of ^";-1+.z.d;1;2021.01m)
+"on May 19, 2021, i ate 1 apple. but i think i ate two the month of Jan 2021"
+
+q)/ but their vector forms are kept as q representations
+q).fmt.fmt("^ would be way too tedious to read as ^";2021.01.01T;0 1+2021.01.01T)
+"Jan 1, 2021 at 00:00:00.000 would be way too tedious to read as 2021.01.01T00:00:00.000 2021.01.02T00:00:00.000"
+
+q)/ you can change S, H, T, D to arbitrary chars or strings
+q).fmt.S:"%^&";.fmt.H:"<<";.fmt.T:">>";.fmt.D:" | "
+q).fmt.fmt("%^& would %^& look at a nested %^&";`why;"anyone";(1 2;3 4.;(.z.d;`weirdness)))
+"`why would anyone look at a nested <<1 2 | 3 4f | <<May 20, 2021 | `weirdness>>>>"
+
+q)/ inserting "" operates idiomatically
+q).fmt.fmt("a%^&b%^&c";"";"")
+"abc"
+
+q)/ it's trivial to customize the type specializer
+q).fmt.mt[10h]:upper
+q).fmt.fmt("he screamed, %^&";"GOT is overrated")
+"he screamed, GOT IS OVERRATED"
+
+pitfalls
+q)/ sufficiently large things may truncate
+q).fmt.fmt("%^&";([]til 100))
+"[x:0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 4..
