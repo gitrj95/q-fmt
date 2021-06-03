@@ -1,72 +1,68 @@
 simple format string lib
 
 motivation
-- pretty printing various things to stdout or stderr is a common logging convention
-- the %x idiom seemed tiresome
+- inserting pretty-printed forms of arbitrary data into a string of some structure is useful
+- e.g. fits logging conventions
+- how a data type gets pretty-printed should be abstracted away from the string
 - allow users the ability to trivially customize
 - recursively walk through composite types (i.e. 0h)
+- allow users to project partially constructed format strings with unfixed arity
 
 interface
-.fmt.S   separator that defines insertion points. defaults to "^". can be any char or string
-.fmt.H   defines the head char of a composite type. defaults to "(". can be any char or string
-.fmt.T   defines the tail char of a composite type. defaults to ")". can be any char or string
-.fmt.D   defines the delimiter between entries of a composite type. defaults to ";". can be any char
-         or string
-.fmt.mt  dictionary that maps types to their string representations. defaults are omitted here.
-         inspect the code and alter to preference
+.fmt.S     separator that defines insertion points. defaults to "^". can be any char or string
+.fmt.H     defines the head char of a composite type. defaults to "(". can be any char or string
+.fmt.T     defines the tail char of a composite type. defaults to ")". can be any char or string
+.fmt.D     defines the delimiter between entries of a composite type. defaults to ";". can be any
+           char or string
+.fmt.mt    dictionary that maps types to their string representations. defaults are omitted here.
+           inspect the code and alter to preference
 
-.fmt.fmt produces a formatted string given a mixed list
+.fmt.sexpr produces a formatted string given an s-expression
+.fmt.mexpr produces a formatted string given an m-expression
 
 examples
-q)/ .fmt.fmt takes a (<string>;<any>;<any>;..)
-q).fmt.fmt("^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`market;10;"pies";5.5)
+q)/ .fmt.sexpr takes a (<string>;<any>;<any>;..)
+q).fmt.sexpr("^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`market;10;"pies";5.5)
 "rj went to the `market to buy 10 pies, but only 5.5 were available"
 
 q)/ can be a (<char>;<any>;<any>;..), too
-q).fmt.fmt("^";1 2 3)
+q).fmt.sexpr("^";1 2 3)
 "1 2 3"
 
+q)/ .fmt.mexpr takes a [<string>;<any>;<any>;..]
+q).fmt.mexpr["^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`store;11;"pizzas";6.6]
+"rj went to the `store to buy 11 pizzas, but only 6.6 were available"
+
+q)/ but, we can partially apply up to some ith argument, given the number of separators defined by
+q)/ the first argument
+q)f:.fmt.mexpr["^ went to the ^ to buy ^ ^, but only ^ were available";"rj"];f[`store;11;"pizzas";6.6]
+"rj went to the `store to buy 11 pizzas, but only 6.6 were available"
+
 q)/ inserting "" operates idiomatically
-q).fmt.fmt("a^b^c";"";"")
+q).fmt.sexpr("a^b^c";"";"")
 "abc"
 
-q)/ boolean atoms and vectors default to words
-q).fmt.fmt("^ isn't in ^";0b;111b)
-"False isn't in True True True"
-
-q)/ dict and table defaults keep keys and their respective values adjacent
-q).fmt.fmt("^ is a simple table. ^ is keyed. ^ is a dict";([]1 2 3);2!([]1 2;3 4;5 6);`a`b!1 2)
-"[x:1 2 3] is a simple table. {[x:1 2, x1:3 4]:[x2:5 6]} is keyed. {`a:1, `b:2} is a dict"
-
-q)/ temporal atoms default to words
-q).fmt.fmt("on ^, i ate ^ apple. but i think i ate two the month of ^";2021.05.19;1;2021.01m)
-"on May 19, 2021, i ate 1 apple. but i think i ate two the month of Jan 2021"
-
-q)/ but their vector forms default to q representations
-q).fmt.fmt("^ vs ^";2021.01.01T;0 1+2021.01.01T)
-"Jan 1, 2021 at 00:00:00.000 vs 2021.01.01T00:00:00.000 2021.01.02T00:00:00.000"
-
 q)/ composite types are recursively resolved to their primitive representations
-q).fmt.fmt("^ is a composite type";(`a`b;1 2.;("apple";([]1 2 3))))
+q).fmt.sexpr("^ is a composite type";(`a`b;1 2.;("apple";([]1 2 3))))
 "(`a`b;1 2f;(apple;[x:1 2 3])) is a composite type"
 
 q)/ enums are resolved to their backing data
 q)x:`a`b`c;a:`x!0 2 0 0 1
-q).fmt.fmt("where did the enum go, ^?";a)
+q).fmt.sexpr("where did the enum go, ^?";a)
 "where did the enum go, `a`c`a`a`b?"
 
 q)/ you can change S, H, T, D to arbitrary chars or strings
 q).fmt.S:"%^&";.fmt.H:"<";.fmt.T:">";.fmt.D:" | "
-q).fmt.fmt("%^& would %^& look at a nested %^&";`why;"anyone";(1 2;3 4.;(2021.05.23;`weirdness)))
+q).fmt.sexpr("%^& would %^& look at a nested %^&";`why;"anyone";(1 2;3 4.;(2021.05.23;`weirdness)))
 "`why would anyone look at a nested <1 2 | 3 4f | <May 23, 2021 | `weirdness>>"
 
 q)/ it's trivial to customize the type specializer, as .fmt.mt[<short>]:<lambda>[<any>] -> <string>
 q)/ if you don't like the defaults, change them
 q).fmt.mt[10h]:upper;.fmt.mt[-7h]:{string[x],"j"}
-q).fmt.fmt("he screamed, %^&, as he ate %^& pies";"GOT is overrated";19)
-"he screamed, GOT IS OVERRATED, as he ate 19j pies"
+q).fmt.sexpr("he screamed, %^&, as he ate %^& pies on %^&";"GOT is overrated";19;2021.01.01)
+"he screamed, GOT IS OVERRATED, as he ate 19j pies on Jan 1, 2021"
 
 pitfalls
 q)/ sufficiently large things may truncate
-q).fmt.fmt("%^&";([]til 100))
+q).fmt.sexpr("%^&";([]til 100))
 "[x:0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 3.."
