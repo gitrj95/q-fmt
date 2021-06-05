@@ -1,0 +1,78 @@
+#+TITLE:q-fmt, a simple format string lib
+#+AUTHOR:rj
+
+* motivation
+- inserting pretty-printed forms of arbitrary data into a string of some structure is useful
+  - e.g. logging conventions
+  - e.g. human readable callbacks
+- how a data type gets pretty-printed should be abstracted away from the string
+  - i.e. no %x idiom
+- allow users the ability to trivially customize
+- recursively walk through composite types
+  - i.e. type 0h
+- allow projection semantics with dynamic arity
+
+* interface
+** config params
+| name    | description                                                                                                                     |
+|---------+---------------------------------------------------------------------------------------------------------------------------------|
+| .fmt.S  | separator that defines insertion points. defaults to "^". can be any char or string                                             |
+| .fmt.H  | defines the head char of a composite type. defaults to "(". can be any char or string                                           |
+| .fmt.T  | defines the tail char of a composite type. defaults to ")". can be any char or string                                           |
+| .fmt.D  | defines the delimiter between entries of a composite type. defaults to ";". can be any char or string                           |
+| .fmt.mt | dictionary that maps types to their string representations. defaults are omitted here. inspect the code and alter to preference |
+** functions
+| name      | description                                       |
+|-----------+---------------------------------------------------|
+| .fmt.sexp | produces a formatted string given an s-expression |
+| .fmt.mexp | produces a formatted string given an m-expression |
+
+* examples
+=q)/ .fmt.sexp takes a (<string>;<any>;<any>;..)=
+=q).fmt.sexp("^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`market;10;"pies";5.5)=
+="rj went to the `market to buy 10 pies, but only 5.5 were available"=
+
+=q)/ can be a (<char>;<any>;<any>;..), too=
+=q).fmt.sexp("^";1 2 3)=
+="1 2 3"=
+
+=q)/ .fmt.mexp takes a [<string>;<any>;<any>;..]=
+=q).fmt.mexp["^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`store;11;"pizzas";6.6]=
+="rj went to the `store to buy 11 pizzas, but only 6.6 were available"=
+
+=q)/ but, we can partially apply up to some ith argument, given the number of separators defined by=
+=q)/ the first argument=
+=q)f:.fmt.mexp["^ went to the ^ to buy ^ ^, but only ^ were available";"rj"];f[`store;11;"pizzas";6.6]=
+="rj went to the `store to buy 11 pizzas, but only 6.6 were available"=
+=q)/ normal projection semantics apply to `f. a more realistic example follows=
+=q)logger:.fmt.mexp["^ ^ [^] ^"][;"myRDB";"DB"];logger[.z.t;"some msg"]=
+="18:35:57.374 myRDB [DB] some msg"=
+
+=q)/ inserting "" operates idiomatically=
+=q).fmt.sexp("a^b^c";"";"")=
+="abc"=
+
+=q)/ composite types are recursively resolved to their primitive representations=
+=q).fmt.sexp("^ is a composite type";(`a`b;1 2.;("apple";([]1 2 3))))=
+="(`a`b;1 2f;(apple;[x:1 2 3])) is a composite type"=
+
+=q)/ enums are resolved to their backing data=
+=q)x:`a`b`c;a:`x!0 2 0 0 1=
+=q).fmt.sexp("where did the enum go, ^?";a)=
+="where did the enum go, `a`c`a`a`b?"=
+
+=q)/ you can change S, H, T, D to arbitrary chars or strings=
+=q).fmt.S:"%^&";.fmt.H:"<";.fmt.T:">";.fmt.D:" | "=
+=q).fmt.sexp("%^& would %^& look at a nested %^&";`why;"anyone";(1 2;3 4.;(2021.05.23;`weirdness)))=
+="`why would anyone look at a nested <1 2 | 3 4f | <May 23, 2021 | `weirdness>>"=
+
+=q)/ it's trivial to customize the type specializer, as .fmt.mt[<short>]:<lambda>[<any>] -> <string>=
+=q)/ if you don't like the defaults, change them=
+=q).fmt.mt[10h]:upper;.fmt.mt[-7h]:{string[x],"j"}=
+=q).fmt.sexp("he screamed, %^&, as he ate %^& pies on %^&";"GOT is overrated";19;2021.01.01)=
+="he screamed, GOT IS OVERRATED, as he ate 19j pies on Jan 1, 2021"=
+
+* pitfalls
+=q)/ sufficiently large things may truncate=
+=q).fmt.sexp("%^&";([]til 100))=
+="[x:0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 3.."=
