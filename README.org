@@ -28,6 +28,7 @@
 | .fmt.mexp | produces a formatted string given an m-expression |
 
 * examples
+#+BEGIN_EXAMPLE
 q)/ .fmt.sexp takes a (<string>;<any>;<any>;..)
 q).fmt.sexp("^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`market;10;"pies";5.5)
 "rj went to the `market to buy 10 pies, but only 5.5 were available"
@@ -35,7 +36,9 @@ q).fmt.sexp("^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`market
 q)/ can be a (<char>;<any>;<any>;..), too
 q).fmt.sexp("^";1 2 3)
 "1 2 3"
+#+END_EXAMPLE
 
+#+BEGIN_EXAMPLE
 q)/ .fmt.mexp takes a [<string>;<any>;<any>;..]
 q).fmt.mexp["^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`store;11;"pizzas";6.6]
 "rj went to the `store to buy 11 pizzas, but only 6.6 were available"
@@ -47,7 +50,9 @@ q)f:.fmt.mexp["^ went to the ^ to buy ^ ^, but only ^ were available";"rj"];f[`s
 q)/ normal projection semantics apply to `f. a more realistic example follows
 q)logger:.fmt.mexp["^ ^ [^] ^"][;"myRDB";"DB"];logger[.z.t;"some msg"]
 "18:35:57.374 myRDB [DB] some msg"
+#+END_EXAMPLE
 
+#+BEGIN_EXAMPLE
 q)/ inserting "" operates idiomatically
 q).fmt.sexp("a^b^c";"";"")
 "abc"
@@ -60,7 +65,9 @@ q)/ enums are resolved to their backing data
 q)x:`a`b`c;a:`x!0 2 0 0 1
 q).fmt.sexp("where did the enum go, ^?";a)
 "where did the enum go, `a`c`a`a`b?"
+#+END_EXAMPLE
 
+#+BEGIN_EXAMPLE
 q)/ you can change S, H, T, D to arbitrary chars or strings
 q).fmt.S:"%^&";.fmt.H:"<";.fmt.T:">";.fmt.D:" | "
 q).fmt.sexp("%^& would %^& look at a nested %^&";`why;"anyone";(1 2;3 4.;(2021.05.23;`weirdness)))
@@ -71,7 +78,7 @@ q)/ if you don't like the defaults, change them
 q).fmt.mt[10h]:upper;.fmt.mt[-7h]:{string[x],"j"}
 q).fmt.sexp("he screamed, %^&, as he ate %^& pies on %^&";"GOT is overrated";19;2021.01.01)
 "he screamed, GOT IS OVERRATED, as he ate 19j pies on Jan 1, 2021"
-
+#+END_EXAMPLE
 * pitfalls
 #+BEGIN_EXAMPLE
 q)/ sufficiently large things may truncate
