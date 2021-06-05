@@ -1,19 +1,19 @@
-#+TITLE:q-fmt, a simple format string lib
+#+TITLE:q-fmt: a simple format string lib
 #+AUTHOR:rj
 
 * motivation
 - inserting pretty-printed forms of arbitrary data into a string of some structure is useful
-  - e.g. logging conventions
-  - e.g. human readable callbacks
+  - /e.g./ logging conventions
+  - /e.g./ human readable callbacks
 - how a data type gets pretty-printed should be abstracted away from the string
-  - i.e. no %x idiom
+  - /i.e./ no =%x= idiom
 - allow users the ability to trivially customize
 - recursively walk through composite types
-  - i.e. type 0h
+  - /i.e./ type =0h=
 - allow projection semantics with dynamic arity
 
 * interface
-** config params
+** configuration
 | name    | description                                                                                                                     |
 |---------+---------------------------------------------------------------------------------------------------------------------------------|
 | .fmt.S  | separator that defines insertion points. defaults to "^". can be any char or string                                             |
