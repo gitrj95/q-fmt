@@ -16,10 +16,10 @@
 ** configuration
 | name    | description                                                                                                                     |
 |---------+---------------------------------------------------------------------------------------------------------------------------------|
-| .fmt.S  | separator that defines insertion points. defaults to ="^"=. can be any char or string                                           |
-| .fmt.H  | defines the head char of a composite type. defaults to ="("=. can be any char or string                                         |
-| .fmt.T  | defines the tail char of a composite type. defaults to =")"=. can be any char or string                                         |
-| .fmt.D  | defines the delimiter between entries of a composite type. defaults to =";"=. can be any char or string                         |
+| .fmt.S  | separator that defines insertion points. defaults to =^=. can be any char or string                                             |
+| .fmt.H  | defines the head char of a composite type. defaults to =(=. can be any char or string                                           |
+| .fmt.T  | defines the tail char of a composite type. defaults to =)=. can be any char or string                                           |
+| .fmt.D  | defines the delimiter between entries of a composite type. defaults to =;=. can be any char or string                           |
 | .fmt.mt | dictionary that maps types to their string representations. defaults are omitted here. inspect the code and alter to preference |
 ** functions
 | name      | description                                       |
