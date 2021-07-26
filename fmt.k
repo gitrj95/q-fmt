@@ -5,7 +5,7 @@ mt:(0#0h)!()
 mt[-10 10h]:(::)
 mt[-1h]:{("false";"true")x};mt[1h]:" "/:mt[-1h]'
 mt[-4h]:-2#$:;mt[4h]:" "/:$:
-mt[-11 -9 -8 -7 -6 -5 -2h]:*$:;mt[2 5 6 7 8 9 11h]:" "/:$:
+mt[-11 -9 -8 -7 -6 -5 -2h]:$:;mt[2 5 6 7 8 9 11h]:" "/:$:
 mt[-12h]:{(mt[-14h]"d"$x)," ",(:/"D"\:$x)};mt[12h]:","/:mt[-12h]'
 mt[-13h]:{($``jan`feb`mar`apr`may`jun`jul`aug`sep`oct`nov`dec `mm$x)," ",$`year$x};mt[13h]:","/:mt[-13h]'
 mt[-14h]:{($``jan`feb`mar`apr`may`jun`jul`aug`sep`oct`nov`dec `mm$x)," ",($`dd$x)," ",$`year$x};mt[14h]:","/:mt[-14h]'
