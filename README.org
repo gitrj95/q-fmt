@@ -1,15 +1,15 @@
-#+TITLE:q-fmt
-#+AUTHOR:rj
+#+title:q-fmt
+#+author:rj
 
 * motivation
 - inserting pretty-printed forms of arbitrary data into a string of some
   structure is useful
-  - /e.g./ logging conventions
-  - /e.g./ human readable callbacks
+  - eg logging conventions
+  - eg human readable callbacks
 - how a data type gets pretty-printed should be abstracted away from the string
-  - /i.e./ no =%x= idiom
+  - ie no =%x= idiom
 - allow users the ability to trivially customize
-- recursively walk through mixed lists (/i.e./ type =0h=)
+- recursively walk through mixed lists (ie type =0h=)
 - allow projection semantics with dynamic arity
 
 * interface
@@ -26,9 +26,8 @@
 |-----------+---------------------------------------------------|
 | .fmt.sexp | produces a formatted string given an s-expression |
 | .fmt.mexp | produces a formatted string given an m-expression |
-
 * examples
-#+BEGIN_EXAMPLE
+#+begin_example
 q)/ .fmt.sexp takes a (<string>;<any>;<any>;..)
 q).fmt.sexp("^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`market;10;"pies";5.5)
 "rj went to the market to buy 10 pies, but only 5.5 were available"
@@ -36,9 +35,9 @@ q).fmt.sexp("^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`market
 q)/ can be a (<char>;<any>;<any>;..), too
 q).fmt.sexp("^";1 2 3)
 "1 2 3"
-#+END_EXAMPLE
+#+end_example
 
-#+BEGIN_EXAMPLE
+#+begin_example
 q)/ .fmt.mexp takes a [<string>;<any>;<any>;..]
 q).fmt.mexp["^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`store;11;"pizzas";6.6]
 "rj went to the store to buy 11 pizzas, but only 6.6 were available"
@@ -50,9 +49,9 @@ q)f:.fmt.mexp["^ went to the ^ to buy ^ ^, but only ^ were available";"rj"];f[`s
 q)/ normal projection semantics apply to `f. a more realistic example follows
 q)logger:.fmt.mexp["^ ^ [^] ^"][;"myRDB";"DB"];logger[.z.t;"some msg"]
 "18:35:57.374 myRDB [DB] some msg"
-#+END_EXAMPLE
+#+end_example
 
-#+BEGIN_EXAMPLE
+#+begin_example
 q)/ inserting "" operates idiomatically
 q).fmt.sexp("a^b^c";"";"")
 "abc"
@@ -65,9 +64,9 @@ q)/ enums are resolved to their backing data
 q)x:`a`b`c;a:`x!0 2 0 0 1
 q).fmt.sexp("where did the enum go, ^?";a)
 "where did the enum go, a c a a b?"
-#+END_EXAMPLE
+#+end_example
 
-#+BEGIN_EXAMPLE
+#+begin_example
 q)/ you can change .fmt.S, .fmt.H, .fmt.T, and .fmt.D to arbitrary
 q)/ characters or strings
 q).fmt.S:"%^&";.fmt.H:"<";.fmt.T:">";.fmt.D:" | "
@@ -80,10 +79,10 @@ q)/ if you don't like the defaults, change them
 q).fmt.mt[10h]:upper;.fmt.mt[-7h]:{string[x],"j"}
 q).fmt.sexp("he screamed, %^&, as he ate %^& pies on %^&";"GOT is overrated";19;2021.01.01)
 "he screamed, GOT IS OVERRATED, as he ate 19j pies on jan 1 2021"
-#+END_EXAMPLE
+#+end_example
 * pitfalls
-#+BEGIN_EXAMPLE
+#+begin_example
 q)/ be wary of size or truncation when sending results elsewhere
 q)('[();-1]).fmt.sexp("%^&";([]til 100))
 ..
-#+END_EXAMPLE
+#+end_example

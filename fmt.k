@@ -20,3 +20,4 @@ f:{rp:-:(#S)*1+!-1+#y;{sp:(0,y)_x;sp[0],z,(#S)_sp 1}/[x;y[0],rp+(1_y)+-1_+\#:'z;
 
 sexp:{if[~10=@xH:(),*x;'`type];xS:xH ss S;if[~(#xS)=-1+#x;'`length];g[xH;xS;x]}
 mexp:('[{if[~10=@xH:(),*x;'`type];a:(#xS:xH ss S)#";";f0:."enlist[",a,"]";'[g[xH;xS];f0]. x};enlist])
+
