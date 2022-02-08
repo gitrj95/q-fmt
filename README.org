@@ -11,6 +11,7 @@
 - allow users the ability to trivially customize
 - recursively walk through mixed lists (ie type =0h=)
 - allow projection semantics with dynamic arity
+- allow m-expressions beyond an arity of 8
 
 * interface
 ** configuration
@@ -20,7 +21,7 @@
 | .fmt.H  | defines the head char of a mixed list. defaults to =(=. can be any char or string                                                 |
 | .fmt.T  | defines the tail char of a mixed list. defaults to =)=. can be any char or string                                                 |
 | .fmt.D  | defines the delimiter between entries of a mixed list. defaults to =;=. can be any char or string                                 |
-| .fmt.mt | dictionary that maps types to their string representations. defaults are omitted here. inspect the code and alter to preference |
+| .fmt.MT | dictionary that maps types to their string representations. defaults are omitted here. inspect the code and alter to preference |
 ** functions
 | name      | description                                       |
 |-----------+---------------------------------------------------|
@@ -28,17 +29,17 @@
 | .fmt.mexp | produces a formatted string given an m-expression |
 * examples
 #+begin_example
-q)/ .fmt.sexp takes a (<string>;<any>;<any>;..)
+q)/ .fmt.sexp takes a (<string>;<any>;<any>;...)
 q).fmt.sexp("^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`market;10;"pies";5.5)
 "rj went to the market to buy 10 pies, but only 5.5 were available"
 
-q)/ can be a (<char>;<any>;<any>;..), too
+q)/ can be a (<char>;<any>;<any>;...), too
 q).fmt.sexp("^";1 2 3)
 "1 2 3"
 #+end_example
 
 #+begin_example
-q)/ .fmt.mexp takes a [<string>;<any>;<any>;..]
+q)/ .fmt.mexp takes a [<string>;<any>;<any>;...]
 q).fmt.mexp["^ went to the ^ to buy ^ ^, but only ^ were available";"rj";`store;11;"pizzas";6.6]
 "rj went to the store to buy 11 pizzas, but only 6.6 were available"
 
@@ -49,6 +50,10 @@ q)f:.fmt.mexp["^ went to the ^ to buy ^ ^, but only ^ were available";"rj"];f[`s
 q)/ normal projection semantics apply to `f. a more realistic example follows
 q)logger:.fmt.mexp["^ ^ [^] ^"][;"myRDB";"DB"];logger[.z.t;"some msg"]
 "18:35:57.374 myRDB [DB] some msg"
+
+q)/ .fmt.mexp is not bound by typical arity limits
+q)f:.fmt.mexp[" "sv 10 1#"^"];f[`by;"order";`of;"the";10;`peaky;`blinders;"-";`thomas;`shelby]
+"by order of the 10 peaky blinders - thomas shelby"
 #+end_example
 
 #+begin_example
@@ -74,15 +79,16 @@ q).fmt.sexp("%^& would %^& look at a nested %^&";`why;"anyone";(1 2;3 4.;(2021.0
 "why would anyone look at a nested <1 2 | 3 4 | <may 23 2021 | weirdness>>"
 
 q)/ it's trivial to customize the type specializer, as
-q)/ .fmt.mt[<short>]:<lambda>[<any>] -> <string>
+q)/ .fmt.MT[<short>]:<lambda>[<any>] -> <string>
 q)/ if you don't like the defaults, change them
-q).fmt.mt[10h]:upper;.fmt.mt[-7h]:{string[x],"j"}
+q).fmt.MT[10h]:upper;.fmt.MT[-7h]:{string[x],"j"}
 q).fmt.sexp("he screamed, %^&, as he ate %^& pies on %^&";"GOT is overrated";19;2021.01.01)
 "he screamed, GOT IS OVERRATED, as he ate 19j pies on jan 1 2021"
 #+end_example
+
 * pitfalls
 #+begin_example
 q)/ be wary of size or truncation when sending results elsewhere
-q)('[();-1]).fmt.sexp("%^&";([]til 100))
-..
+q)-1 .fmt.sexp("%^&";([]til 100))
+...
 #+end_example
