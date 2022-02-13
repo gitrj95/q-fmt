@@ -19,4 +19,4 @@ s:{$[(#MT)=ix:(!MT)?x;'`nyi;(. MT)[ix]y]};wt:{$[@x;s .$[(@x)within 20 76h;(@. x;
 f:{m:&/#:'(y;z);$[m;f1[x;m#y;wt'm#z];x]};f1:{$[y 0;y[0]#x;()],/{x,(#S)_y}'[z;y_x]}
 
 sexp:{if[~10=@h:*x,:();'`type];f[h;h ss S;x_:0]}
-mexp:{if[~10=@h:*x,:();'`type];fs:f[h;ix:h ss S;x_:0];$[d:(#ix)-#x;f[fs;fs ss S]$[d-:1;."enlist[",(d#";"),"]";enlist]::;fs]}enlist::
+mexp:{if[~10=@h:*x,:();'`type];fs:f[h;h ss S;x_:0];$[d:#ix:fs ss S;f[fs;ix]$[d-:1;."enlist[",(d#";"),"]";enlist]::;fs]}enlist::
